@@ -1,7 +1,7 @@
 """
 Defination of NN model
 """
-from keras.layers import Dense, Dropout
+from keras.layers import Dense, Dropout, Activation
 from keras.layers.recurrent import LSTM, GRU
 from keras.models import Sequential
 
@@ -58,6 +58,7 @@ def _get_sae(inputs, hidden, output):
 
     model = Sequential()
     model.add(Dense(hidden, input_dim=inputs, name='hidden'))
+    model.add(Activation('sigmoid'))
     model.add(Dropout(0.2))
     model.add(Dense(output))
 
@@ -79,8 +80,11 @@ def get_saes(layers):
 
     saes = Sequential()
     saes.add(Dense(layers[1], input_dim=layers[0], name='hidden1'))
+    saes.add(Activation('sigmoid'))
     saes.add(Dense(layers[2], name='hidden2'))
+    saes.add(Activation('sigmoid'))
     saes.add(Dense(layers[3], name='hidden3'))
+    saes.add(Activation('sigmoid'))
     saes.add(Dropout(0.2))
     saes.add(Dense(layers[4]))
 
