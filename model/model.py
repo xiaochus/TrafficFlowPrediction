@@ -20,7 +20,7 @@ def get_lstm(units):
     model.add(LSTM(units[1], input_shape=(units[0], 1), return_sequences=True))
     model.add(LSTM(units[2]))
     model.add(Dropout(0.2))
-    model.add(Dense(units[3], activation='linear'))
+    model.add(Dense(units[3], activation='sigmoid'))
 
     return model
 
@@ -39,7 +39,7 @@ def get_gru(units):
     model.add(GRU(units[1], input_shape=(units[0], 1), return_sequences=True))
     model.add(GRU(units[2]))
     model.add(Dropout(0.2))
-    model.add(Dense(units[3], activation='linear'))
+    model.add(Dense(units[3], activation='sigmoid'))
 
     return model
 
@@ -60,7 +60,7 @@ def _get_sae(inputs, hidden, output):
     model.add(Dense(hidden, input_dim=inputs, name='hidden'))
     model.add(Activation('sigmoid'))
     model.add(Dropout(0.2))
-    model.add(Dense(output))
+    model.add(Dense(output, activation='sigmoid'))
 
     return model
 
@@ -86,7 +86,7 @@ def get_saes(layers):
     saes.add(Dense(layers[3], name='hidden3'))
     saes.add(Activation('sigmoid'))
     saes.add(Dropout(0.2))
-    saes.add(Dense(layers[4]))
+    saes.add(Dense(layers[4], activation='sigmoid'))
 
     models = [sae1, sae2, sae3, saes]
 

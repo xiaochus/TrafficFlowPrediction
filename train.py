@@ -62,6 +62,7 @@ def train_seas(models, X_train, y_train, name, config):
 
         m = models[i]
         m.compile(loss="mse", optimizer="rmsprop", metrics=['mape'])
+
         m.fit(temp, y_train, batch_size=config["batch"],
               epochs=config["epochs"],
               validation_split=0.05)

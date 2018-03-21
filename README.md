@@ -2,10 +2,10 @@
 Traffic Flow Prediction with Neural Networks(SAEs、LSTM、GRU).
 
 ## Requirement
-- Python 3.5    
-- Tensorflow-gpu 1.2.0  
+- Python 3.6    
+- Tensorflow-gpu 1.5.0  
 - Keras 2.1.3
-- scikit-learn 0.18
+- scikit-learn 0.19
 
 ## Train the model
 
@@ -39,9 +39,9 @@ These are the details for the traffic flow prediction experiment.
 
 | Metrics | MAE | MSE | RMSE | MAPE |  R2  | Explained variance score |
 | ------- |:---:| :--:| :--: | :--: | :--: | :----------------------: |
-| LSTM | 7.16 | 94.20 | 9.71 | 21.25% | 0.9420 | 0.9421 |
-| GRU | 7.18 | 95.01 | 9.75| 17.42% | 0.9415 | 0.9415 |
-| SAEs | 7.71 | 106.46 | 10.32 | 25.62% | 0.9344 | 0.9352 |
+| LSTM | 7.21 | 98.05 | 9.90 | 16.56% | 0.9396 | 0.9419 |
+| GRU | 7.20 | 99.32 | 9.97| 16.78% | 0.9389 | 0.9389|
+| SAEs | 7.06 | 92.08 | 9.60 | 17.80% | 0.9433 | 0.9442 |
 
 ![evaluate](/images/eva.png)
 
