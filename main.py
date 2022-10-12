@@ -97,8 +97,9 @@ def main():
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     saes = load_model('model/saes.h5')
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'GRU', 'SAEs']
+    my_model = load_model('model/my_model.h5')
+    models = [lstm, gru, saes, my_model]
+    names = ['LSTM', 'GRU', 'SAEs', 'My_model']
 
     lag = 12
     file1 = 'data/train.csv'
@@ -108,7 +109,7 @@ def main():
 
     y_preds = []
     for name, model in zip(names, models):
-        if name == 'SAEs':
+        if name == 'SAEs' or name == 'My_model':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
         else:
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
