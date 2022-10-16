@@ -71,8 +71,8 @@ def plot_results(y_true, y_preds, names):
         y_pred: List/ndarray, predicted data.
         names: List, Method names.
     """
-    d = '2016-3-4 00:00'
-    x = pd.date_range(d, periods=288, freq='5min')
+    d = '2006-3-4 00:00'
+    x = pd.date_range(d, periods=96, freq='15min')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -101,13 +101,14 @@ def main():
     models = [lstm, gru, saes, my_model]
     names = ['LSTM', 'GRU', 'SAEs', 'My_model']
 
-    lag = 12
-    file1 = 'data/train.csv'
+    lag = 4
+    file1 = 'data/BoroondaraData.csv'
     file2 = 'data/test.csv'
     _, _, X_test, y_test, scaler = process_data(file1, file2, lag)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
 
     y_preds = []
+
     for name, model in zip(names, models):
         if name == 'SAEs' or name == 'My_model':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
