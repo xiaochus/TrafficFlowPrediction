@@ -68,29 +68,44 @@ def process_data(train, test, timeFrame):
 
     # Convert to inputs
     # [[-60min, -45min, -30min, -15min, LAT, LONG, EXPECTED OUTPUT/0min], ...]
+    # [[Time in mins, LAT, LONG, EXPECTED OUTPUT/0min], ...]
+
+    # train = []
+    # for i in range(0, len(flowValues)):
+    #     for j in range(timeFrame, len(flowValues[i])):
+    #         # print(flowValues[i, j - timeFrame : j + 1])
+    #         # print(latitude[i])
+    #         # print(longnitude[i])
+    #         k = j
+    #         if k >= len(flowValues[i]) - 1:
+    #             k = -1
+    #         inputs = np.append(flowValues[i, j - timeFrame : k], latlong[i])
+    #         inputs = np.append(inputs, flowValues[i, k + 1])
+    #         train.append(inputs)
 
     train = []
     for i in range(0, len(flowValues)):
-        for j in range(timeFrame, len(flowValues[i])):
+        for j in range(96):
             # print(flowValues[i, j - timeFrame : j + 1])
             # print(latitude[i])
             # print(longnitude[i])
             k = j
-            if k >= len(flowValues[i]) - 1:
+            if k == 95:
                 k = -1
-            inputs = np.append(flowValues[i, j - timeFrame : k], latlong[i])
+            inputs = np.append([j * 15 / 1440], latlong[i])
             inputs = np.append(inputs, flowValues[i, k + 1])
             train.append(inputs)
 
     train = np.array(train)
-    np.random.shuffle(train)
 
     splitIndex = floor(len(train) * 0.7)
+    X_test = train[splitIndex:, :-1]
+    y_test = train[splitIndex:, -1]
+
+    np.random.shuffle(train[:splitIndex, :])
 
     X_train = train[:splitIndex, :-1]
     y_train = train[:splitIndex, -1]
-    X_test = train[splitIndex:, :-1]
-    y_test = train[splitIndex:, -1]
 
     return X_train, y_train, X_test, y_test, flowScaler
 

@@ -93,19 +93,68 @@ def plot_results(y_true, y_preds, names):
     plt.show()
 
 
+def plot_results_no_true(y_preds, names):
+    """Plot
+    Plot the true data and predicted data.
+
+    # Arguments
+        y_true: List/ndarray, ture data.
+        y_pred: List/ndarray, predicted data.
+        names: List, Method names.
+    """
+    d = '2006-3-4 00:00'
+    x = pd.date_range(d, periods=96, freq='15min')
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for name, y_pred in zip(names, y_preds):
+        ax.plot(x, y_pred, label=name)
+
+    plt.legend()
+    plt.grid(True)
+    plt.xlabel('Time of Day')
+    plt.ylabel('Flow')
+
+    date_format = mpl.dates.DateFormatter("%H:%M")
+    ax.xaxis.set_major_formatter(date_format)
+    fig.autofmt_xdate()
+
+    plt.show()
+
+def createTestDay():
+    latlong = [0.00165656, 0.99987643]
+    x_test = []
+
+    for i in range(1440):
+        x_test.append(np.append([i * 15 / 1440], latlong))
+    
+    return np.array(x_test)
+    
 def main():
     lstm = load_model('model/lstm.h5')
-    gru = load_model('model/gru.h5')
-    saes = load_model('model/saes.h5')
-    my_model = load_model('model/my_model.h5')
-    models = [lstm, gru, saes, my_model]
-    names = ['LSTM', 'GRU', 'SAEs', 'My_model']
+    # gru = load_model('model/gru.h5')
+    # saes = load_model('model/saes.h5')
+    # my_model = load_model('model/my_model.h5')
+    # models = [lstm, gru, saes, my_model]
+    # names = ['LSTM', 'GRU', 'SAEs', 'My_model']
+    models = [lstm]
+    names = ['LSTM']
 
     lag = 4
     file1 = 'data/BoroondaraData.csv'
     file2 = 'data/test.csv'
     _, _, X_test, y_test, scaler = process_data(file1, file2, lag)
-    y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
+    # print(y_test)
+    # print(y_test.shape)
+    # y_test = np.pad(y_test.reshape(-1, 1), (0, 95), 'empty')[:y_test.shape[0], :]
+    # print(y_test)
+    # print(y_test.shape)
+    y_test_new = np.zeros(shape=(len(y_test), 96))
+    y_test_new[:,0] = y_test.reshape(-1, 1)[:,0]
+    y_test = scaler.inverse_transform(y_test_new).reshape(1, -1)[0]
+
+    X_test = createTestDay()
 
     y_preds = []
 
@@ -116,14 +165,23 @@ def main():
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
         file = 'images/' + name + '.png'
         plot_model(model, to_file=file, show_shapes=True)
+
         predicted = model.predict(X_test)
-        predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-        y_preds.append(predicted[:288])
-        print(name)
-        eva_regress(y_test, predicted)
 
-    plot_results(y_test[: 288], y_preds, names)
+        # print(predicted)
+        predicted_new = np.zeros(shape=(len(predicted), 96))
+        predicted_new[:,0] = predicted.reshape(-1, 1)[:, 0]
+        predicted = scaler.inverse_transform(predicted_new)[:, 0].reshape(1, -1)[0]
 
+        y_preds.append(predicted[:96])
+        # print(name)
+        # eva_regress(y_test, predicted)
+
+    # print(y_test[: 96])
+    # print(y_preds)
+    plot_results_no_true(y_preds, names)
+    # plot_results(y_test[: 96], y_preds, names)
 
 if __name__ == '__main__':
+    # print(createTestDay())
     main()
