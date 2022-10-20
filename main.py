@@ -14,6 +14,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore")
 
+# Data class that holds values for route creation
 class coordData:
     def __init__(self, scatsNumber, streets, latitude, longitude, id):
         self.scatsNumber = scatsNumber
