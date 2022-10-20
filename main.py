@@ -13,6 +13,13 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore")
 
+class coordData:
+    def __init__(self, scatsNumber, streets, latitude, longitude, id):
+        self.scatsNumber = scatsNumber
+        self.streets = streets
+        self.latitude = latitude
+        self.longitude = longitude
+        self.id = id
 
 def MAPE(y_true, y_pred):
     """Mean Absolute Percentage Error
@@ -132,6 +139,33 @@ def createTestDay():
     return np.array(x_test)
     
 def main():
+    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Tim's code for setting up data for navigation
+    # set up data for generating route
+    data = pd.read_csv('data/BoroondaraData.csv', encoding='utf-8').fillna(0)
+    scatsNumber = data['SCATS Number'].to_numpy()
+    streets = data['Location']
+    latitude = data['NB_LATITUDE'].to_numpy()
+    longitude = data['NB_LONGITUDE'].to_numpy()
+    id = data['HF VicRoads Internal'].to_numpy()
+
+    #loop through data to create list of objects containing relevant data
+    dataList = []
+    i = 0
+    #set i < value to be equal to list of scats, currently set to 200 for testing and time saving
+    while i < 200:
+        dataList.append(coordData(scatsNumber[i], streets[i], round(latitude[i] + 0.00155, 5), round(longitude[i] + 0.00113, 5), id[i]))
+        i+=1
+
+    print(len(dataList))
+    print(dataList[163].scatsNumber)
+    print(dataList[163].streets)
+    print(dataList[163].latitude)
+    print(dataList[163].longitude)
+    print(dataList[163].id)
+    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
     lstm = load_model('model/lstm.h5')
     # gru = load_model('model/gru.h5')
     # saes = load_model('model/saes.h5')
@@ -185,3 +219,4 @@ def main():
 if __name__ == '__main__':
     # print(createTestDay())
     main()
+
