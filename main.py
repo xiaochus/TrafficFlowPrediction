@@ -149,15 +149,15 @@ def main():
     longitude = data['NB_LONGITUDE'].to_numpy()
     id = data['HF VicRoads Internal'].to_numpy()
 
-    #loop through data to create list of objects containing relevant data
+    #Create list of scats ids so dont need to read in all 4000+ rows
     dataList = []
     idList = []
     for x in id:
         if not x in idList:
             idList.append(x)
 
+    #loop through data to create list of objects containing relevant data
     i = 0
-    #set i < value to be equal to list of scats, currently set to 200 for testing and time saving
     while i < len(id):
         if id[i] in idList:
             dataList.append(coordData(scatsNumber[i], streets[i], round(latitude[i] + 0.00155, 5), round(longitude[i] + 0.00113, 5), id[i]))
