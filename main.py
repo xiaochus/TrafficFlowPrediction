@@ -1,6 +1,7 @@
 """
 Traffic Flow Prediction with Neural Networks(SAEs、LSTM、GRU).
 """
+from array import array
 import math
 import warnings
 import numpy as np
@@ -150,18 +151,29 @@ def main():
 
     #loop through data to create list of objects containing relevant data
     dataList = []
+    idList = []
+    for x in id:
+        if not x in idList:
+            idList.append(x)
+
     i = 0
     #set i < value to be equal to list of scats, currently set to 200 for testing and time saving
-    while i < 200:
-        dataList.append(coordData(scatsNumber[i], streets[i], round(latitude[i] + 0.00155, 5), round(longitude[i] + 0.00113, 5), id[i]))
+    while i < len(id):
+        if id[i] in idList:
+            dataList.append(coordData(scatsNumber[i], streets[i], round(latitude[i] + 0.00155, 5), round(longitude[i] + 0.00113, 5), id[i]))
+            idList.remove(id[i])
         i+=1
 
+    # print(idList)
+    # print(len(idList))
     print(len(dataList))
-    print(dataList[163].scatsNumber)
-    print(dataList[163].streets)
-    print(dataList[163].latitude)
-    print(dataList[163].longitude)
-    print(dataList[163].id)
+    for x in dataList:
+        print('-----------------------')
+        print(x.scatsNumber)
+        print(x.streets)
+        print(x.latitude)
+        print(x.longitude)
+        print(x.id)        
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
