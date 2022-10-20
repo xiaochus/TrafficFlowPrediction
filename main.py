@@ -17,7 +17,8 @@ warnings.filterwarnings("ignore")
 class coordData:
     def __init__(self, scatsNumber, streets, latitude, longitude, id):
         self.scatsNumber = scatsNumber
-        self.streets = streets
+        self.street1 = streets.split(" ")[0]
+        self.street2 = streets.split(" ")[len(streets.split(" "))-1]
         self.latitude = latitude
         self.longitude = longitude
         self.id = id
@@ -170,7 +171,7 @@ def main():
     for x in dataList:
         print('-----------------------')
         print(x.scatsNumber)
-        print(x.streets)
+        print(f'{x.street1} : {x.street2}')
         print(x.latitude)
         print(x.longitude)
         print(x.id)        
