@@ -5,6 +5,7 @@ import heapq
 import math
 from tabnanny import check
 from turtle import distance
+from typing import overload
 import warnings
 import numpy as np
 import pandas as pd
@@ -46,7 +47,6 @@ class coordData:
         for x in self.neighbours:
             if x == node:
                 return calculateWeight(self, node)
-        #return self.neighbours[node].weight
 
     def setPrevious(self, prev):
         self.previous = prev
@@ -54,7 +54,13 @@ class coordData:
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - setting up neighbours
 
 def calculateWeight(current, neighbour):
-    weight = distanceBetweenVectors(current, neighbour)
+    if current.street1 == neighbour.street1 or current.street1 == neighbour.street2 or current.street2 == neighbour.street1 or current.street2 == neighbour.street2:
+        weight = distanceBetweenVectors(current, neighbour)
+    else:
+        vector = (current.latitude, neighbour.longitude)
+        value1 = distanceBetweenVectorsOverload(vector[0], vector[1], current.latitude, current.longitude)
+        value2 = distanceBetweenVectorsOverload(vector[0], vector[1], neighbour.latitude, neighbour.longitude)
+        weight = value1+value2
     return weight
 
 
@@ -65,9 +71,16 @@ def findNeighbours(dataList):
     # for x in dataList:
     #     x.neighbours = getClosestNeighbours(x)
 
-    for x in dataList:
+    nullNodes = []
+    for x in dataList:        
         if len(x.neighbours) == 0:
+            nullNodes.append(x)
             x.neighbours = neighboursForNull(dataList, x)
+
+    for x in dataList:
+        for y in nullNodes:
+            if x in y.neighbours:
+                x.neighbours.append(y)
 
     return dataList
 
@@ -173,6 +186,10 @@ def distanceBetweenVectors(node1, node2):
     distance = math.sqrt((node1.latitude - node2.latitude)**2 + (node1.longitude - node2.longitude)**2)
     return distance
 
+def distanceBetweenVectorsOverload(v1lat, v1lon, v2lat, v2lon):
+    distance = math.sqrt((v1lat - v2lat)**2 + (v1lon - v2lon)**2)
+    return distance
+
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 def shortest(target, path):
@@ -268,10 +285,10 @@ def prepareRoutes():
             print(f'{x.scatsNumber}: {y.scatsNumber}')
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-    dijkstra(dataList, dataList[34], dataList[30])
-    print(dataList[34].scatsNumber, dataList[30].scatsNumber)
+    dijkstra(dataList, dataList[12], dataList[22])
+    print(dataList[12].scatsNumber, dataList[22].scatsNumber)
 
-    target = dataList[30]
+    target = dataList[22]
     path = [target.id]
     shortest(target, path)
     print(('The shortest path : %s' %(path[::-1])))
