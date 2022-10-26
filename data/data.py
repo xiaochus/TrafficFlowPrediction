@@ -86,9 +86,6 @@ def process_data(train, test, timeFrame):
     train = []
     for i in range(0, len(flowValues)):
         for j in range(96):
-            # print(flowValues[i, j - timeFrame : j + 1])
-            # print(latitude[i])
-            # print(longnitude[i])
             k = j
             if k == 95:
                 k = -1
@@ -107,7 +104,7 @@ def process_data(train, test, timeFrame):
     X_train = train[:splitIndex, :-1]
     y_train = train[:splitIndex, -1]
 
-    return X_train, y_train, X_test, y_test, flowScaler
+    return X_train, y_train, X_test, y_test, flowScaler, latScaler, longScaler
 
 # dfOrig = pd.read_csv('data/train.csv', encoding='utf-8').fillna(0)
 # attr = "Lane 1 Flow (Veh/5 Minutes)"

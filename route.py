@@ -222,7 +222,7 @@ def dijkstra(dataList, startNode, endNode):
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-def main():
+def prepareRoutes():
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Tim's code for setting up data for navigation
     # set up data for generating route
     data = pd.read_csv('data/BoroondaraData.csv', encoding='utf-8').fillna(0)
@@ -278,6 +278,13 @@ def main():
 
     # for x in dataList:
     #     print(f'{x.id} : {x.scatsNumber}')
+
+
+    return dataList
+    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+def main():
+    prepareRoutes()
 
 if __name__ == '__main__':
     main()
