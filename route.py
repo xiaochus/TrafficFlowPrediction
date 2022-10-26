@@ -3,6 +3,7 @@ from asyncio.windows_events import NULL
 from codecs import unicode_escape_decode
 import heapq
 import math
+import random
 from tabnanny import check
 from turtle import distance
 from typing import overload
@@ -31,7 +32,6 @@ class coordData:
         self.id = id
         self.visited = False
         self.distance = sys.maxsize
-        self.weight = 0
         self.previous = None
     
     def setVisited(self, bool):
@@ -198,7 +198,7 @@ def shortest(target, path):
         shortest(target.previous, path)
     return
 
-def dijkstra(dataList, startNode, endNode):
+def dijkstra(dataList, startNode, routeNumber):
     #set distance of start node to 0
     startNode.setDistance(0)
 
@@ -213,20 +213,20 @@ def dijkstra(dataList, startNode, endNode):
         current.setVisited(True)
 
         #for next in node's neighbours
-        for next in current.neighbours:
+        for next in current.neighbours:            
             #if visited, skip
             if next.visited:
                 continue
             newDist = current.getDistance() + current.getWeight(next)
-
+                            
             if newDist < next.getDistance():
                 next.setDistance(newDist)
                 next.setPrevious(current)
-                print ('updated : current = %s next = %s new_dist = %s' \
-                        %(current.scatsNumber, next.scatsNumber, next.getDistance()))
-            #else:
-                # print ('not updated : current = %s next = %s new_dist = %s' \
-                #         %(current.scatsNumber, next.scatsNumber, next.getDistance()))
+                    # print ('updated : current = %s next = %s new_dist = %s' \
+                    #         %(current.scatsNumber, next.scatsNumber, next.getDistance()))
+                    #else:
+                    # print ('not updated : current = %s next = %s new_dist = %s' \
+                    #         %(current.scatsNumber, next.scatsNumber, next.getDistance()))
 
         #rebuild heap
         #pop every item
@@ -285,17 +285,25 @@ def prepareRoutes():
             print(f'{x.scatsNumber}: {y.scatsNumber}')
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-    dijkstra(dataList, dataList[12], dataList[22])
-    print(dataList[12].scatsNumber, dataList[22].scatsNumber)
+    startNode = dataList[22]
+    endNode = dataList[39]
+    numberOfRoutes = len(startNode.neighbours)
+    if numberOfRoutes > 5:
+        numberOfRoutes = 5
+    i = 0
+    while (i < numberOfRoutes):
+        dijkstra(dataList, startNode, i)
+        #print(dataList[25].scatsNumber, dataList[15].scatsNumber)
 
-    target = dataList[22]
-    path = [target.id]
-    shortest(target, path)
-    print(('The shortest path : %s' %(path[::-1])))
+        target = endNode
+        path = [target.id]
+        shortest(target, path)
+        print(('The shortest path : %s' %(path[::-1])))
 
-    # for x in dataList:
-    #     print(f'{x.id} : {x.scatsNumber}')
-
+        # for x in dataList:
+        #     print(f'{x.id} : {x.scatsNumber}')
+            
+        i += 1
 
     return dataList
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
