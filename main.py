@@ -1,10 +1,11 @@
 """
 Traffic Flow Prediction with Neural Networks(SAEs、LSTM、GRU).
 """
-from array import array
 from asyncio.windows_events import NULL
 import math
+from multiprocessing.spawn import prepare
 from tabnanny import check
+from typing import Literal
 import warnings
 import numpy as np
 import pandas as pd
@@ -14,7 +15,19 @@ from keras.utils.vis_utils import plot_model
 import sklearn.metrics as metrics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from flask import Flask, request, jsonify, render_template
 warnings.filterwarnings("ignore")
+
+
+lstm = None
+gru = None
+saes = None
+my_model = None
+y_scaler = None
+lat_scaler = None
+long_scaler = None
+flask_app = Flask(__name__)
+dataList = []
 
 # Data class that holds values for route creation
 class coordData:
@@ -237,7 +250,42 @@ def checkIfNullForArray(value1, value2):
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-def main():
+# Time is expected in minutes past 12am
+def getTrafficData(locationData: coordData, time: float, model: Literal['lstm', 'gru', 'saes', 'my_model']):
+    print(locationData.latitude)
+    print(locationData.longitude)
+
+    correctedTime = time / 1440
+    preparedLatitude = lat_scaler.transform(np.array(locationData.latitude).reshape(1, -1))[0][0]
+    preparedLongitude = long_scaler.transform(np.array(locationData.longitude).reshape(1, -1))[0][0]
+    print('====================')
+    print(preparedLatitude)
+    print(preparedLongitude)
+    X_test = np.array([[correctedTime, preparedLatitude, preparedLongitude]])
+    if model == 'SAEs' or model == 'My_model':
+        X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
+    else:
+        X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+
+    selectedModel = NULL
+    if model == 'lstm':
+        selectedModel = lstm
+    elif model == 'gru':
+        selectedModel = gru
+    elif model == 'saes':
+        selectedModel= saes
+    elif model == 'my_model':
+        selectedModel = my_model
+
+    predicted = selectedModel.predict(X_test)
+
+    predicted_new = np.zeros(shape=(len(predicted), 96))
+    predicted_new[:,0] = predicted.reshape(-1, 1)[:, 0]
+    predicted = y_scaler.inverse_transform(predicted_new)[:, 0].reshape(1, -1)[0][0]
+    
+    return predicted
+
+def prepareLocations():
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Tim's code for setting up data for navigation
     # set up data for generating route
     data = pd.read_csv('data/BoroondaraData.csv', encoding='utf-8').fillna(0)
@@ -247,6 +295,7 @@ def main():
     longitude = data['NB_LONGITUDE'].to_numpy()
 
     #Create list of scats ids so dont need to read in all 4000+ rows
+    global dataList
     dataList = []
     scatsList = []
     for x in scatsNumber:
@@ -265,26 +314,26 @@ def main():
 
     # print(idList)
     # print(len(idList))
-    print(len(dataList))
-    for x in dataList:
-        print('-----------------------')
-        print(x.scatsNumber)
-        print(f'{x.street1} : {x.street2}')
-        print(x.latitude)
-        print(x.longitude)   
-        print(f'id: {x.id}')
-
+    # print(len(dataList))
+    # for x in dataList:
+    #     print('-----------------------')
+    #     print(x.scatsNumber)
+    #     print(f'{x.street1} : {x.street2}')
+    #     print(x.latitude)
+    #     print(x.longitude)   
+    #     print(f'id: {x.id}')
     dataList = findNeighbours(dataList)
-    for x in dataList:
-        print('--------------------------')
-        if len(x.neighbours) == 0:
-            print(f'{x.scatsNumber}: NULL')
-        for y in x.neighbours:
-            print(f'{x.scatsNumber}: {y.scatsNumber}')
+    # for x in dataList:
+    #     print('--------------------------')
+    #     if len(x.neighbours) == 0:
+    #         print(f'{x.scatsNumber}: NULL')
+    #     for y in x.neighbours:
+    #         print(f'{x.scatsNumber}: {y.scatsNumber}')
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 
+def main():
     lstm = load_model('model/lstm.h5')
     # gru = load_model('model/gru.h5')
     # saes = load_model('model/saes.h5')
@@ -335,7 +384,73 @@ def main():
     plot_results_no_true(y_preds, names)
     # plot_results(y_test[: 96], y_preds, names)
 
+def initialiseModels():
+    global lstm
+    global gru
+    global saes
+    global my_model
+    global y_scaler
+    global lat_scaler
+    global long_scaler
+
+    print ("Loading models")
+    lstm = load_model('model/lstm.h5')
+    gru = load_model('model/gru.h5')
+    # saes = load_model('model/saes.h5')
+    my_model = load_model('model/my_model.h5')
+    print("Models loaded! Processing data")
+
+    file1 = 'data/BoroondaraData.csv'
+    file2 = ''
+    _, _, _, _, y_scaler, lat_scaler, long_scaler = process_data(file1, '', 0)
+
+    print("Data processed!")
+
+
+    # location = dataList[0]
+    # time = 10 * 60
+
+    # print(f"Testing traffic at location: {location.street1} : {location.street2} | {location.latitude}, {location.longitude} at {time} mins")
+
+    # print(getTrafficData(location, time, 'LSTM'))
+    # print(getTrafficData(location, time, 'My_model'))
+    # print(getTrafficData(location, time, 'GRU'))
+    # print(getTrafficData(location, time, 'SAEs'))
+
+
+# /?street1=WARRIGAL_RD&street2=STREET_RD&time=600&model=My_model
+@flask_app.route("/api")
+def traffic_api():
+    street1 = request.args.get('street1', default="", type= str)
+    street2 = request.args.get('street2', default="", type= str)
+    time = request.args.get('time', default = 12*60, type = int)
+    model_type = request.args.get('model', default = "lstm", type = str)
+
+    foundLocation = next((x for x in dataList if x.street1 == street1 and x.street2 == street2), None)
+
+    if foundLocation == None:
+        return f"<p>Could not find the street data</p>"
+
+    prediction = getTrafficData(foundLocation, time, model_type)
+
+    return jsonify(prediction)
+
+@flask_app.route("/locations")
+def locations_api():
+    return jsonify(dataList)
+
+@flask_app.route("/")
+def index():
+    return render_template('index.html', locations = dataList)
+
+initialiseModels()
+prepareLocations()
+
 if __name__ == '__main__':
+    initialiseModels()
     # print(createTestDay())
-    main()
+    # print("aaaa")
+    
+
+    # main()
 

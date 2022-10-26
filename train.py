@@ -86,10 +86,10 @@ def main(argv):
     args = parser.parse_args()
 
     lag = 4
-    config = {"batch": 256, "epochs": 30}
+    config = {"batch": 256, "epochs": 100}
     file1 = 'data/BoroondaraData.csv'
     file2 = 'data/test.csv'
-    X_train, y_train, _, _, _ = process_data(file1, file2, lag)
+    X_train, y_train, _, _, _, _, _ = process_data(file1, file2, lag)
 
     # print(X_train)
     # print(X_train[0])

@@ -107,7 +107,7 @@ def process_data(train, test, timeFrame):
     X_train = train[:splitIndex, :-1]
     y_train = train[:splitIndex, -1]
 
-    return X_train, y_train, X_test, y_test, flowScaler
+    return X_train, y_train, X_test, y_test, flowScaler, latScaler, longScaler
 
 # dfOrig = pd.read_csv('data/train.csv', encoding='utf-8').fillna(0)
 # attr = "Lane 1 Flow (Veh/5 Minutes)"

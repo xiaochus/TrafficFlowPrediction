@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=1080, initial-scale=1.0" />
+		<title>Traffic Flow Prediction System</title>
+
+		<style>
+			form {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+		</style>
+
+		<script defer>
+			function submitForm() {
+				const street1 = document.getElementById('Street-1').value;
+				const street2 = document.getElementById('Street-2').value;
+				const time = document.getElementById('time').value;
+				const model = document.getElementById('model').value;
+
+				let correctedTime = parseInt(time.split(':')[0]) * 60 + parseInt(time.split(':')[1]);
+
+				console.log(
+					`/api?street1=${street1.split(', ')[0]}&street2=${street1.split(', ')[1]}&time=${correctedTime}&model=${model}`
+				);
+				const data = fetch(
+					`/api?street1=${street1.split(', ')[0]}&street2=${street1.split(', ')[1]}&time=${correctedTime}&model=${model}`
+				).then((response) => {
+					response.json().then((data) => {
+						console.log(data)
+						document.getElementById('result').innerText = data;
+					})
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<form action="javascript:submitForm()">
+			<label for="Street-1">Origin</label>
+			<select name="Street 1" id="Street-1">
+				{% for location in locations %}
+				<option value="{{ location.street1 }}, {{ location.street2 }}">
+					{{ location.street1 }} | {{ location.street2 }}
+				</option>
+				{% endfor %}
+			</select>
+			<label for="Street-2">Destination</label>
+			<select name="Street 2" id="Street-2">
+				{% for location in locations %}
+				<option value="{{ location.street1 }}, {{ location.street2 }}">
+					{{ location.street1 }} | {{ location.street2 }}
+				</option>
+				{% endfor %}
+			</select>
+			<label for="time">Time</label>
+			<input type="time" value="12:00" id="time" />
+			<label for="model">Model</label>
+			<select name="Model" id="model">
+				<option value="lstm">LSTM</option>
+				<option value="my_model">Our Model</option>
+				<option value="gru">GRU</option>
+			</select>
+			<button type="submit">Get Route!</button>
+		</form>
+		<p id="result"></p>
+	</body>
+</html>
