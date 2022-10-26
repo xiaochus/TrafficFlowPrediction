@@ -162,15 +162,9 @@ def createTestDay():
 
 # Time is expected in minutes past 12am
 def getTrafficData(locationData: coordData, time: float, model: Literal['lstm', 'gru', 'saes', 'my_model']):
-    print(locationData.latitude)
-    print(locationData.longitude)
-
     correctedTime = time / 1440
     preparedLatitude = lat_scaler.transform(np.array(locationData.latitude).reshape(1, -1))[0][0]
     preparedLongitude = long_scaler.transform(np.array(locationData.longitude).reshape(1, -1))[0][0]
-    print('====================')
-    print(preparedLatitude)
-    print(preparedLongitude)
     X_test = np.array([[correctedTime, preparedLatitude, preparedLongitude]])
     if model == 'SAEs' or model == 'My_model':
         X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
@@ -266,6 +260,8 @@ def initialiseModels():
     file2 = ''
     _, _, _, _, y_scaler, lat_scaler, long_scaler = process_data(file1, '', 0)
 
+    print(lat_scaler.data_min_)
+    print(lat_scaler.data_max_)
     print(lat_scaler.data_range_)
 
     print("Data processed!")
@@ -309,10 +305,10 @@ def index():
     return render_template('index.html', locations = dataList)
 
 initialiseModels()
-prepareRoutes()
+dataList = prepareRoutes()
 
-if __name__ == '__main__':
-    initialiseModels()
+# if __name__ == '__main__':
+#     initialiseModels()
     # print(createTestDay())
     # print("aaaa")
     

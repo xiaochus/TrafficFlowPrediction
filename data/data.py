@@ -86,9 +86,6 @@ def process_data(train, test, timeFrame):
     train = []
     for i in range(0, len(flowValues)):
         for j in range(96):
-            # print(flowValues[i, j - timeFrame : j + 1])
-            # print(latitude[i])
-            # print(longnitude[i])
             k = j
             if k == 95:
                 k = -1

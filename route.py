@@ -145,22 +145,22 @@ def prepareRoutes():
 
     # print(idList)
     # print(len(idList))
-    print(len(dataList))
-    for x in dataList:
-        print('-----------------------')
-        print(x.scatsNumber)
-        print(f'{x.street1} : {x.street2}')
-        print(x.latitude)
-        print(x.longitude)   
-        print(f'id: {x.id}')
+    # print(len(dataList))
+    # for x in dataList:
+    #     print('-----------------------')
+    #     print(x.scatsNumber)
+    #     print(f'{x.street1} : {x.street2}')
+    #     print(x.latitude)
+    #     print(x.longitude)   
+    #     print(f'id: {x.id}')
 
     dataList = findNeighbours(dataList)
-    for x in dataList:
-        print('--------------------------')
-        if len(x.neighbours) == 0:
-            print(f'{x.scatsNumber}: NULL')
-        for y in x.neighbours:
-            print(f'{x.scatsNumber}: {y.scatsNumber}')
+    # for x in dataList:
+    #     print('--------------------------')
+    #     if len(x.neighbours) == 0:
+    #         print(f'{x.scatsNumber}: NULL')
+    #     for y in x.neighbours:
+    #         print(f'{x.scatsNumber}: {y.scatsNumber}')
 
     return dataList
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
