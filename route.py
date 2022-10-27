@@ -194,11 +194,11 @@ def distanceBetweenVectorsOverload(v1lat, v1lon, v2lat, v2lon):
 
 def shortest(target, path):
     if target.previous:
-        path.append(target.previous.id)
+        path.append(target.previous)
         shortest(target.previous, path)
     return
 
-def dijkstra(dataList, startNode, routeNumber):
+def dijkstra(dataList, startNode):
     #set distance of start node to 0
     startNode.setDistance(0)
 
@@ -267,49 +267,45 @@ def prepareRoutes():
 
     # print(idList)
     # print(len(idList))
-    print(len(dataList))
-    for x in dataList:
-        print('-----------------------')
-        print(x.scatsNumber)
-        print(f'{x.street1} : {x.street2}')
-        print(x.latitude)
-        print(x.longitude)   
-        print(f'id: {x.id}')    
+    # print(len(dataList))
+    # for x in dataList:
+    #     print('-----------------------')
+    #     print(x.scatsNumber)
+    #     print(f'{x.street1} : {x.street2}')
+    #     print(x.latitude)
+    #     print(x.longitude)   
+    #     print(f'id: {x.id}')    
 
     dataList = findNeighbours(dataList.copy())
-    for x in dataList:
-        print('--------------------------')
-        if len(x.neighbours) == 0:
-            print(f'{x.scatsNumber}: NULL')
-        for y in x.neighbours:
-            print(f'{x.scatsNumber}: {y.scatsNumber}')
-    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-    startNode = dataList[22]
-    endNode = dataList[39]
-    numberOfRoutes = len(startNode.neighbours)
-    if numberOfRoutes > 5:
-        numberOfRoutes = 5
-    i = 0
-    while (i < numberOfRoutes):
-        dijkstra(dataList, startNode, i)
-        #print(dataList[25].scatsNumber, dataList[15].scatsNumber)
-
-        target = endNode
-        path = [target.id]
-        shortest(target, path)
-        print(('The shortest path : %s' %(path[::-1])))
-
-        # for x in dataList:
-        #     print(f'{x.id} : {x.scatsNumber}')
-            
-        i += 1
+    # for x in dataList:
+    #     print('--------------------------')
+    #     if len(x.neighbours) == 0:
+    #         print(f'{x.scatsNumber}: NULL')
+    #     for y in x.neighbours:
+    #         print(f'{x.scatsNumber}: {y.scatsNumber}')
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    
 
     return dataList
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+def pathFind(dataList, start, end):
+    startNode = dataList[start]
+    endNode = dataList[end]
+    dijkstra(dataList, startNode)
+    #print(dataList[25].scatsNumber, dataList[15].scatsNumber)
+
+    target = endNode
+    path = [target]
+    shortest(target, path)
+    #print(('The shortest path : %s' %(path[::-1])))
+
+    # for x in dataList:
+    #     print(f'{x.id} : {x.scatsNumber}')
+    return path
+
 def main():
-    prepareRoutes()
+    dataList = prepareRoutes()
+    pathFind(dataList)
 
 if __name__ == '__main__':
     main()

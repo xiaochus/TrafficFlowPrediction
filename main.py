@@ -15,10 +15,11 @@ from keras.utils.vis_utils import plot_model
 import sklearn.metrics as metrics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from sympy import symbols, solve
 from flask import Flask, request, jsonify, render_template
 warnings.filterwarnings("ignore")
 
-from route import prepareRoutes
+from route import prepareRoutes, pathFind, calculateWeight, coordData
 
 
 lstm = None
@@ -31,17 +32,6 @@ long_scaler = None
 flask_app = Flask(__name__)
 dataList = []
 
-# Data class that holds values for route creation
-class coordData:
-    def __init__(self, scatsNumber, streets, latitude, longitude, id):
-        neighbours = []
-
-        self.scatsNumber = scatsNumber
-        self.street1 = streets.split(" ")[0]
-        self.street2 = streets.split(" ")[len(streets.split(" "))-1]
-        self.latitude = latitude
-        self.longitude = longitude
-        self.id = id
 
 def MAPE(y_true, y_pred):
     """Mean Absolute Percentage Error
@@ -304,8 +294,44 @@ def locations_api():
 def index():
     return render_template('index.html', locations = dataList)
 
+def findRouteTime(path, startTime, model):
+    times = []
+    distances = []
+    currentTime = startTime
+    i = 0
+
+    print(f'path length: {len(path)}')
+    while i < (len(path)-1):
+        flow = getTrafficData(path[i], currentTime, model)
+        y = symbols('y')
+        expr = ((-0.7722222*(y**2)) + (46.3*y)) - flow
+        sol = solve(expr)
+
+        tempDistance = calculateWeight(path[i], path[i+1]) #gets distance in degrees
+        distance = tempDistance * 111 #gives distance in kilometers (roughly)
+        distances.append(distance)
+        timeTaken = (distance/sol[1]) * 60 #gives time in minutes, uses speed assuming low traffic
+        currentTime += int(timeTaken)
+        times.append(timeTaken)
+        i += 1
+
+    totalTime = 0
+    for x in times:
+        totalTime += x
+
+    totalDistance = 0
+    for x in distances:
+        totalDistance += x
+
+    print(f'time v dist: {totalTime} : {totalDistance}')
+    return (totalTime, totalDistance) #returns time in minutes
+
 initialiseModels()
 dataList = prepareRoutes()
+path = pathFind(dataList, 34, 19)
+totalTime = findRouteTime(path, 12*60, 'my_model')
+
+
 
 # if __name__ == '__main__':
 #     initialiseModels()
