@@ -25,8 +25,8 @@ class coordData:
         self.neighbours = []
 
         self.scatsNumber = scatsNumber
-        self.street1 = streets.split(" of ")[0][:-2]
-        self.street2 = streets.split(" of ")[len(streets.split(" of "))-1]
+        self.street1 = streets.lower().split(" of ")[0][:-2]
+        self.street2 = streets.lower().split(" of ")[len(streets.split(" of "))-1]
         self.latitude = latitude
         self.longitude = longitude
         self.id = id
