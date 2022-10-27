@@ -329,7 +329,7 @@ def findRouteTime(path, startTime, model):
 initialiseModels()
 dataList = prepareRoutes()
 path = pathFind(dataList, 34, 19)
-totalTime = findRouteTime(path, 12*60, 'my_model')
+totalTimeAndDistance = findRouteTime(path, 12*60, 'my_model')
 
 
 
