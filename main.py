@@ -340,7 +340,7 @@ def findRouteTime(path, startTime, model):
         totalDistance += x
 
     print(f'time v dist: {totalTime} : {totalDistance}')
-    return (totalTime, totalDistance) #returns time in minutes
+    return (totalTime, totalDistance) #returns time in minutes and distance in km
 
 initialiseModels()
 dataList = prepareRoutes()
