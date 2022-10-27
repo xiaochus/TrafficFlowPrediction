@@ -25,14 +25,17 @@
 				let correctedTime = parseInt(time.split(':')[0]) * 60 + parseInt(time.split(':')[1]);
 
 				console.log(
-					`/api?street1=${street1.split(', ')[0]}&street2=${street1.split(', ')[1]}&time=${correctedTime}&model=${model}`
+					`/api?origin=${street1}&destination=${street2}&time=${correctedTime}&model=${model}`
 				);
 				const data = fetch(
-					`/api?street1=${street1.split(', ')[0]}&street2=${street1.split(', ')[1]}&time=${correctedTime}&model=${model}`
+					`/api?origin=${street1}&destination=${street2}&time=${correctedTime}&model=${model}`
 				).then((response) => {
 					response.json().then((data) => {
 						console.log(data)
-						document.getElementById('result').innerText = data;
+
+						document.getElementById('total-time').innerText = `${data.totalTime} mins`;
+						document.getElementById('total-distance').innerText = `${data.distance} km`;
+						document.getElementById('route').innerText = data.route.join(' => ');
 					})
 				});
 			}
@@ -43,7 +46,7 @@
 			<label for="Street-1">Origin</label>
 			<select name="Street 1" id="Street-1">
 				{% for location in locations %}
-				<option value="{{ location.street1 }}, {{ location.street2 }}">
+				<option value="{{ location.id }}">
 					{{ location.street1 }} | {{ location.street2 }}
 				</option>
 				{% endfor %}
@@ -51,7 +54,7 @@
 			<label for="Street-2">Destination</label>
 			<select name="Street 2" id="Street-2">
 				{% for location in locations %}
-				<option value="{{ location.street1 }}, {{ location.street2 }}">
+				<option value="{{ location.id }}">
 					{{ location.street1 }} | {{ location.street2 }}
 				</option>
 				{% endfor %}
@@ -66,6 +69,8 @@
 			</select>
 			<button type="submit">Get Route!</button>
 		</form>
-		<p id="result"></p>
+		<p id="total-time"></p>
+		<p id="total-distance"></p>
+		<p id="route"></p>
 	</body>
 </html>

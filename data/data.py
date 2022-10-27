@@ -1,6 +1,7 @@
 """
 Processing the data
 """
+from concurrent.futures import process
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -54,6 +55,14 @@ def process_data(train, test, timeFrame):
     firstColPos = df1.columns.get_loc("V00")
     
     flowData = df1.to_numpy()[:, firstColPos:]
+
+    # highest = 0
+    # for i in range(len(flowData)):
+    #     for j in range(len(flowData[i])):
+    #         if flowData[i][j] > highest:
+    #             highest = flowData[i][j]
+    #             print(f'{i} {j} = {highest}')
+
     latitude = df1['NB_LATITUDE'].to_numpy().reshape(-1, 1)
     longnitude = df1['NB_LONGITUDE'].to_numpy().reshape(-1, 1)
     
@@ -95,14 +104,23 @@ def process_data(train, test, timeFrame):
 
     train = np.array(train)
 
-    splitIndex = floor(len(train) * 0.7)
-    X_test = train[splitIndex:, :-1]
-    y_test = train[splitIndex:, -1]
+    # splitIndex = floor(len(train) * 0.7)
+    X_train = train[:, :-1]
+    y_train = train[:, -1]
 
-    np.random.shuffle(train[:splitIndex, :])
+    # print(y_test)
+    # highest = 0
+    # for i in range(len(y_test)):
+    #     if y_test[i] > highest:
+    #         highest = y_test[i]
+    #         print(f'{i} = {highest}')
 
-    X_train = train[:splitIndex, :-1]
-    y_train = train[:splitIndex, -1]
+    # np.random.shuffle(train[:splitIndex, :])
+
+    # X_train = train[:splitIndex, :-1]
+    # y_train = train[:splitIndex, -1]
+    X_test = None
+    y_test = None
 
     return X_train, y_train, X_test, y_test, flowScaler, latScaler, longScaler
 
@@ -203,3 +221,5 @@ def process_data(train, test, timeFrame):
 # print(train[:, :-1])
 # print(train[:, -1])
 # print(dfOrig[attr].values.reshape(-1, 1))
+
+# process_data('data/BoroondaraData.csv', '', 0)

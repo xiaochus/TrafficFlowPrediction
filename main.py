@@ -17,6 +17,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from sympy import symbols, solve
 from flask import Flask, request, jsonify, render_template
+import json
 warnings.filterwarnings("ignore")
 
 from route import prepareRoutes, pathFind, calculateWeight, coordData
@@ -267,24 +268,39 @@ def initialiseModels():
     # print(getTrafficData(location, time, 'GRU'))
     # print(getTrafficData(location, time, 'SAEs'))
 
-
 # /?street1=WARRIGAL_RD&street2=STREET_RD&time=600&model=My_model
 @flask_app.route("/api")
 def traffic_api():
-    street1 = request.args.get('street1', default="", type= str)
-    street2 = request.args.get('street2', default="", type= str)
+    origin = request.args.get('origin', default=0, type = int)
+    destination = request.args.get('destination', default=0, type = int)
     time = request.args.get('time', default = 12*60, type = int)
     model_type = request.args.get('model', default = "lstm", type = str)
 
-    foundLocation = next((x for x in dataList if x.street1 == street1 and x.street2 == street2), None)
+    # foundOrigin = next((x for x in dataList if x.id == origin), None)
+    # foundDestination = next((x for x in dataList if x.id == destination), None)
 
-    if foundLocation == None:
-        error = {error: "Could not find location"}
-        return jsonify(error)
+    # if foundOrigin == None or foundDestination == None:
+    #     print(f'ERROR: Could not find origin or destination: {origin}, {foundOrigin} | {destination}, {foundDestination}')
+    #     error = {error: "Could not find location"}
+    #     return jsonify(error)
 
-    prediction = getTrafficData(foundLocation, time, model_type)
+    path = pathFind(dataList, origin, destination)
+    totalTimeAndDistance = findRouteTime(path, time, 'my_model')
 
-    return jsonify(prediction)
+    # print(path)
+    # print(totalTimeAndDistance)
+
+    streetList = []
+    for loc in path:
+        streetList.append(f'{loc.street1}, {loc.street2}')
+
+    data = {
+        "route": streetList.reverse(),
+        "totalTime": str(totalTimeAndDistance[0]),
+        "distance": str(totalTimeAndDistance[1])
+    }
+
+    return jsonify(data)
 
 @flask_app.route("/locations")
 def locations_api():
@@ -328,8 +344,8 @@ def findRouteTime(path, startTime, model):
 
 initialiseModels()
 dataList = prepareRoutes()
-path = pathFind(dataList, 34, 19)
-totalTimeAndDistance = findRouteTime(path, 12*60, 'my_model')
+# path = pathFind(dataList, 34, 19)
+# totalTimeAndDistance = findRouteTime(path, 12*60, 'my_model')
 
 
 
