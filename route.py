@@ -194,6 +194,7 @@ def distanceBetweenVectorsOverload(v1lat, v1lon, v2lat, v2lon):
 
 def shortest(target, path):
     if target.previous:
+        print(f'{target.previous.street1}, {target.previous.street2}')
         path.append(target.previous)
         shortest(target.previous, path)
     return
@@ -288,14 +289,26 @@ def prepareRoutes():
     return dataList
     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+def prepareDatalist(dataList):
+    for location in dataList:
+        location.setVisited(False)
+        location.setPrevious(None)
+        location.setDistance(sys.maxsize)
+
+    return dataList
+
 def pathFind(dataList, start, end):
     startNode = dataList[start]
     endNode = dataList[end]
+
+    dataList = prepareDatalist(dataList)
+
     dijkstra(dataList, startNode)
     #print(dataList[25].scatsNumber, dataList[15].scatsNumber)
 
     target = endNode
     path = [target]
+    print(f'{path[0].street1}, {path[0].street2}')
     shortest(target, path)
     #print(('The shortest path : %s' %(path[::-1])))
 
