@@ -241,7 +241,7 @@ def initialiseModels():
     global long_scaler
 
     print ("Loading models")
-    lstm = load_model('model/lstm.h5')
+    # lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     # saes = load_model('model/saes.h5')
     my_model = load_model('model/my_model.h5')
@@ -285,7 +285,7 @@ def traffic_api():
     #     return jsonify(error)
 
     path = pathFind(dataList, origin, destination)
-    totalTimeAndDistance = findRouteTime(path, time, 'my_model')
+    totalTimeAndDistance = findRouteTime(path, time, model_type)
 
     # print(path)
     # print(totalTimeAndDistance)
@@ -294,8 +294,13 @@ def traffic_api():
     for loc in path:
         streetList.append(f'{loc.street1}, {loc.street2}')
 
+    print(path)
+    print(streetList)
+
+    streetList.reverse()
+
     data = {
-        "route": streetList.reverse(),
+        "route": streetList,
         "totalTime": str(totalTimeAndDistance[0]),
         "distance": str(totalTimeAndDistance[1])
     }
@@ -310,6 +315,9 @@ def locations_api():
 def index():
     return render_template('index.html', locations = dataList)
 
+A = -(200/32**2)
+B = -2 * 32 * A
+
 def findRouteTime(path, startTime, model):
     times = []
     distances = []
@@ -320,7 +328,7 @@ def findRouteTime(path, startTime, model):
     while i < (len(path)-1):
         flow = getTrafficData(path[i], currentTime, model)
         y = symbols('y')
-        expr = ((-0.7722222*(y**2)) + (46.3*y)) - flow
+        expr = ((A*(y**2)) + (B*y)) - flow
         sol = solve(expr)
 
         tempDistance = calculateWeight(path[i], path[i+1]) #gets distance in degrees

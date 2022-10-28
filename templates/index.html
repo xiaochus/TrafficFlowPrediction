@@ -13,9 +13,22 @@
 				flex-direction: column;
 				align-items: center;
 			}
+
+			.returned-data {
+				margin: auto;
+				text-align: center;
+				width: 30%;
+			}
 		</style>
 
 		<script defer>
+			function minsToTimeStr(mins) {
+				const remainingMins = mins % 60
+				const hours = Math.floor(mins / 60)
+				
+				return `${hours}:${Math.round(remainingMins)}`
+			}
+
 			function submitForm() {
 				const street1 = document.getElementById('Street-1').value;
 				const street2 = document.getElementById('Street-2').value;
@@ -33,8 +46,8 @@
 					response.json().then((data) => {
 						console.log(data)
 
-						document.getElementById('total-time').innerText = `${data.totalTime} mins`;
-						document.getElementById('total-distance').innerText = `${data.distance} km`;
+						document.getElementById('total-time').innerText = `The journey will take approximately ${Math.round(parseFloat(data.totalTime))} mins and you will arrive at ${minsToTimeStr(correctedTime + parseFloat(data.totalTime))}`;
+						document.getElementById('total-distance').innerText = `${Math.round(parseFloat(data.distance))} km`;
 						document.getElementById('route').innerText = data.route.join(' => ');
 					})
 				});
@@ -69,8 +82,8 @@
 			</select>
 			<button type="submit">Get Route!</button>
 		</form>
-		<p id="total-time"></p>
-		<p id="total-distance"></p>
-		<p id="route"></p>
+		<p class="returned-data" id="route"></p>
+		<p class="returned-data" id="total-time"></p>
+		<p class="returned-data" id="total-distance"></p>
 	</body>
 </html>
