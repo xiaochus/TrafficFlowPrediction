@@ -56,8 +56,8 @@ def train_seas(models, X_train, y_train, name, config):
     for i in range(len(models) - 1):
         if i > 0:
             p = models[i - 1]
-            hidden_layer_model = Model(input=p.input,
-                                       output=p.get_layer('hidden').output)
+            hidden_layer_model = Model(p.input,
+                                       p.get_layer('hidden').output)
             temp = hidden_layer_model.predict(temp)
 
         m = models[i]
@@ -86,11 +86,15 @@ def main(argv):
     args = parser.parse_args()
 
     lag = 12
-    config = {"batch": 256, "epochs": 600}
+    config = {"batch": 256, "epochs": 2}
     file1 = 'data/train.csv'
     file2 = 'data/test.csv'
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
 
+    if args.model == 'my_model':
+        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
+        m = model.get_my_model([12, 64, 64, 1])
+        train_model(m, X_train, y_train, args.model, config)
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         m = model.get_lstm([12, 64, 64, 1])
